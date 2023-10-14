@@ -1,0 +1,57 @@
+name: Laravel Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4' # Specify your desired PHP version
+
+    - name: Install Composer
+      run: |
+        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+        php composer-setup.php
+        php -r "unlink('composer-setup.php');"
+        mv composer.phar /usr/local/bin/composer
+      shell: bash
+
+    - name: Install Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14' # Specify your desired Node.js version
+
+    - name: Install NPM packages
+      run: npm install
+      working-directory: ../../app 
+
+    - name: Install Composer dependencies
+      run: composer install
+      working-directory: ../../app 
+
+    - name: Build assets
+      run: npm run production
+      working-directory: ../../app 
+
+    - name: Publish Laravel application
+      run: php artisan migrate --force
+      working-directory: ../../app 
+
+    - name: Deploy to IIS using Web Deploy
+      uses: appleskin/iis-web-deploy@v1
+      with:
+        webdeploy-endpoint: 'http://192.168.15.67:9012/msdeploy.axd' 
+        webdeploy-username: 'ahmad.monarch'
+        webdeploy-password: 'PrivateEye213' 
+        package: ../../app 
+        site-name: 'ops.ibedc.com' 
