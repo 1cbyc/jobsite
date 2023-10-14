@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Blog;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -46,26 +45,28 @@ class BlogController extends Controller
 
     public function edit(Blog $blog)
     {
-        // I would implement a view for editing blog posts after I commit this
+        $this->authorize('update', $blog); 
+
+        return view('blogs.edit', compact('blog'));
     }
 
     public function update(Request $request, Blog $blog)
     {
+        $this->authorize('update', $blog); 
+
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
         ]);
 
-        // I would also add the authorization check here to enable users to edit  blog posts
-
         $blog->update($validatedData);
 
-        return response()->json(['blog' => $blog], 200); // 200 OK
+        return response()->json(['blog' => $blog], 200);
     }
 
     public function destroy(Blog $blog)
     {
-        // I also want to add an authorization check to allow users delete the blog posts created
+        $this->authorize('delete', $blog); 
 
         $blog->delete();
 
