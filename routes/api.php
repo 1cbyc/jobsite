@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,9 +12,12 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
 Route::middleware('auth:api')->group(function () {
-    Route::resource('blogs', 'BlogController');
+    Route::get('/blogs', 'BlogController@index');
+    Route::post('/blogs', 'BlogController@store');
+    Route::get('/blogs/{blog}', 'BlogController@show');
+    Route::put('/blogs/{blog}', 'BlogController@update');
+    Route::delete('/blogs/{blog}', 'BlogController@destroy');
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
